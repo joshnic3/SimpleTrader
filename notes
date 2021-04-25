@@ -1,0 +1,66 @@
+Model (does strat)
+    - Simple trading strategy, buy low sell high
+    - market data is under here
+
+View (api/view)
+    - Simple Web Ui
+    - shows useful data
+    - offers user control over strategy
+
+Controller (api/controller)
+    - run model
+    - alter parameters in the strategy such as risk appetite
+     and limits
+    - pause and resume auto trading
+
+All under rest api:
+    - api/view
+    - api/controller
+
+
+------------------------------------------------------------
+
+Model
+-----
+
+ - Read market data at X time interval
+ - Generate a rolling mean for X reads
+ - Work out standard deviation every interval
+ - calculate sell and buy limits based on thresholds (x stdevs)
+
+
+Controller
+----------
+ - User Configurable Parameters
+    - Market data read request interval (x seconds)
+    - rolling mean length (x reads)
+    - sell threshold (x stddevs)
+    - buy thresholds (x stdevs)
+    -
+
+---------------------------
+
+single model to update any parameter
+    - can be used for refresh interval too if i make it a parameter
+(controller) click on param or some items (heartbeat counter) to open edit model
+
+
+
+
+{'symbol': 'ETHUSDT', 'orderId': 210803, 'orderListId': -1, 'clientOrderId': 'gSe9MBMC4mh2NOA9ik18dj', 'transactTime': 1619355480641, 'price': '0.00000000', 'origQty': '1.00000000', 'executedQty': '1.00000000', 'cummulativeQuoteQty': '200.00000000', 'status': 'FILLED', 'timeInForce': 'GTC', 'type': 'MARKET', 'side': 'SELL', 'fills': [{'price': '200.00000000', 'qty': '1.00000000', 'commission': '0.00000000', 'commissionAsset': 'USDT', 'tradeId': 4041}]}
+
+
+MIN_NOTIONAL
+
+
+
+# demo_starting_parameters = {
+#     'starting_side': SELL,
+#     'trajectory_limit': 0,
+#     'buy_appetite': 0.5,
+#     'sell_appetite': 0.25,
+#     'units_to_trade': 1,
+#     'look_back_minutes': '60',
+#     'ticker': 'ETHUSDT',
+#     'base_currency': 'USDT',
+# }
