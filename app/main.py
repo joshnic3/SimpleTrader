@@ -50,7 +50,7 @@ def once():
 @local_only
 def stop():
     controller.stop()
-    return jsonify({'stopped': controller.running})
+    return jsonify({'stopped': not controller.running})
 
 
 @app.route("/controller/update")

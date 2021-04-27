@@ -68,7 +68,15 @@ function run() {
     runButton.innerHTML = 'Starting...';
     runButton.blur();
 
-    postRequest('/controller/start', console.log)
+    postRequest('/controller/start', runCallback)
+}
+
+function runCallback(data) {
+    if (data.started) {
+        console.log('Started');
+    } else {
+        warn('Failed to start.');
+    }
 }
 
 function stopped(data) {
@@ -99,12 +107,20 @@ function stop() {
     runButton.classList.add("btn-warning");
     runButton.innerHTML = 'Stopping..';
 
-    postRequest('/controller/stop', console.log);
+    postRequest('/controller/stop', stopCallback);
 }
 
-function ranOnce(data) {
+function stopCallback(data) {
+    if (data.stopped) {
+        console.log('Stopped');
+    } else {
+        warn('Failed to stop.');
+    }
+}
+
+function ranOnceCallback(data) {
     if (data.ran) {
-        console.log('ran');
+        console.log('Ran Once');
     } else {
         warn('Failed to set off run.');
     }
@@ -116,7 +132,7 @@ function runOnce() {
     runButton.classList.remove("btn-success");
     runButton.innerHTML = 'Running once...';
     runButton.blur();
-    postRequest('/controller/once', ranOnce);
+    postRequest('/controller/once', ranOnceCallback);
 }
 
 function warn(message) {
@@ -143,7 +159,7 @@ function updateController() {
     fetch(request).then(function (response) {
         return response.json();
     }).then(function (data) {
-        console.log(data.status)
+//        console.log(data.status)
         orderCountDiv = document.getElementById("ordersLink");
         runCountDiv = document.getElementById("runsLink");
         if (data.status.isRunning) {
