@@ -3,6 +3,7 @@ import yaml
 from lib.controller import Controller
 from lib.model import Model
 from lib.utilities.exchange import Trader, Binance
+from datetime import datetime
 
 
 def read_configs_from_yaml_file(yaml_file_path):
@@ -16,3 +17,11 @@ def setup_controller(configs, exchange_account, test=False):
     _trader = Trader(_exchange)
     _model = Model(configs.get('starting_parameters'))
     return Controller(_model, _trader)
+
+
+def handshake_key():
+    return datetime.now().strftime('%Y%m%d%H%M%S%f')
+
+
+def handshake_url(key):
+    return 'http://localhost:5000/handshake?k={}'.format(key)

@@ -176,6 +176,8 @@
                 document.getElementById("heartbeat").classList.add("bg-warning");
                 document.getElementById("heartbeat").classList.add("text-dark");
                 document.getElementById("heartbeat").innerHTML = "STATIC";
+                document.getElementById("runButton").disabled = true;
+                document.getElementById("runOptions").disabled = true;
             } else {
                 document.getElementById("heartbeat").classList.add("bg-primary");
                 setInterval(refresh, {{ refresh_interval * 1000 }});
