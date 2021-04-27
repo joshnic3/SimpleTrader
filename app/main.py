@@ -2,32 +2,8 @@ import os
 
 from flask import Flask, request, jsonify
 
-from lib.utilities.setup import setup_controller
+from lib.utilities.setup import setup_controller, read_configs_from_yaml_file
 from lib.view import View
-
-configs = {
-    'starting_parameters': {
-        'starting_side': 'sell',
-        'trajectory_limit': 0,
-        'buy_appetite': 0.5,
-        'sell_appetite': 0.5,
-        'units_to_trade': 55,
-        'look_back_minutes': '60',
-        'ticker': 'DOGEGBP',
-        'base_currency': 'GBP'
-    },
-    'exchange': {
-        'BinanceSimpleTrader': {
-            'key': 'sI2Tgf549Y7HdVlfMQwetESKlHcYUtZ21tnyVIhxwOhCGiIFBDzzNW9c1ZNIFPXM',
-            'secret': 'jJrBwR9iWDVL7PhUL3U3a1CVahQHEw5D4ucF79zJ2QS8tfkdranKYrh1R6onSAM5'
-        },
-        'BinanceTest': {
-            'key': 'i5yLY20Zy43aELQSLM0NChNWl64vpwWFPuem4vMplD4xxH0NXE7WpdIWN1fJjH1r',
-            'secret': 'ac8nV4IzOddUIWP3kXMzlIA6aOA331yAF5s2EzcJuXG0OX99xHo4PJZXVgJASEJK'
-        }
-    }
-}
-
 
 web_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'web')
 app = Flask(
@@ -36,6 +12,9 @@ app = Flask(
     static_folder=os.path.join(web_dir, 'static'),
     template_folder=os.path.join(web_dir, 'templates')
 )
+
+yaml_file_path = '/Users/joshnicholls/Desktop/SimpleTrader/configs.yaml'
+configs = read_configs_from_yaml_file(yaml_file_path)
 controller = setup_controller(configs, 'BinanceSimpleTrader', test=False)
 
 

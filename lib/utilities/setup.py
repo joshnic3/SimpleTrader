@@ -1,10 +1,13 @@
+import yaml
+
 from lib.controller import Controller
 from lib.model import Model
 from lib.utilities.exchange import Trader, Binance
-import yaml
 
-# with open(file_path) as yaml_file:
-#     configs = yaml.load(yaml_file, Loader=yaml.FullLoader)
+
+def read_configs_from_yaml_file(yaml_file_path):
+    with open(yaml_file_path) as yaml_file:
+        return yaml.load(yaml_file, Loader=yaml.FullLoader)
 
 
 def setup_controller(configs, exchange_account, test=False):
