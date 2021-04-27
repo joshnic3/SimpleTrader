@@ -45,8 +45,8 @@ function running(data) {
         runOnceButton = document.getElementById("runOnceButton");
 
         runButton.classList.add("disabled");
+        runButton.classList.remove("btn-warning");
         runButton.classList.add("btn-outline-success");
-        runButton.classList.remove("btn-success");
         runButton.innerHTML = 'Running... <div id="runningSpinner" class="spinner-border spinner-border-sm text-success" role="status" data-bs-toggle="tooltip" data-bs-placement="right" title="Running"></div>';
         runButton.blur();
 
@@ -61,7 +61,14 @@ function running(data) {
 }
 
 function run() {
-    postRequest('/controller/start', running)
+    runButton = document.getElementById("runButton");
+    runButton.classList.add("disabled");
+    runButton.classList.add("btn-warning");
+    runButton.classList.remove("btn-success");
+    runButton.innerHTML = 'Starting...';
+    runButton.blur();
+
+    postRequest('/controller/start', console.log)
 }
 
 function stopped(data) {
@@ -71,7 +78,7 @@ function stopped(data) {
         runOnceButton = document.getElementById("runOnceButton");
 
         runButton.classList.remove("disabled");
-        runButton.classList.remove("btn-outline-success");
+        runButton.classList.remove("btn-warning");
         runButton.classList.add("btn-success");
         runButton.innerHTML = 'Auto';
 
@@ -87,11 +94,29 @@ function stopped(data) {
 }
 
 function stop() {
-    postRequest('/controller/stop', stopped);
+    runButton = document.getElementById("runButton");
+    runButton.classList.remove("btn-outline-success");
+    runButton.classList.add("btn-warning");
+    runButton.innerHTML = 'Stopping..';
+
+    postRequest('/controller/stop', console.log);
+}
+
+function ranOnce(data) {
+    if (data.ran) {
+        console.log('ran');
+    } else {
+        warn('Failed to set off run.');
+    }
 }
 
 function runOnce() {
-    postRequest('/controller/once', console.log);
+   runButton.classList.add("disabled");
+    runButton.classList.add("btn-warning");
+    runButton.classList.remove("btn-success");
+    runButton.innerHTML = 'Running once...';
+    runButton.blur();
+    postRequest('/controller/once', ranOnce);
 }
 
 function warn(message) {
@@ -100,6 +125,11 @@ function warn(message) {
         warningAlert.classList.remove("collapse");
         document.getElementById("warningAlertMessage").innerHTML = '<strong>Warning!</strong> ' + message;
     }
+}
+
+function dismissWarm() {
+    warningAlert = document.getElementById("warningAlert");
+    warningAlert.classList.add("collapse");
 }
 
 

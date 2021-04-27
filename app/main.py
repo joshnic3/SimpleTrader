@@ -2,10 +2,20 @@ import os
 
 from flask import Flask, request, jsonify
 
+import webbrowser
+
 from lib.utilities.setup import setup_controller, read_configs_from_yaml_file
 from lib.utilities.web import get_params_from_request, local_only
 from lib.view import View
 
+
+
+yaml_file_path = '/Users/joshnicholls/Desktop/SimpleTrader/configs.yaml'
+open_browser = False
+
+
+configs = read_configs_from_yaml_file(yaml_file_path)
+controller = setup_controller(configs, 'BinanceSimpleTrader', test=False)
 
 web_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'web')
 app = Flask(
@@ -15,30 +25,32 @@ app = Flask(
     template_folder=os.path.join(web_dir, 'templates')
 )
 
-yaml_file_path = '/Users/joshnicholls/Desktop/SimpleTrader/configs.yaml'
-configs = read_configs_from_yaml_file(yaml_file_path)
-controller = setup_controller(configs, 'BinanceSimpleTrader', test=False)
+
+if open_browser:
+    webbrowser.open('http://0.0.0.0:5000')
 
 
 @app.route("/controller/start")
 @local_only
 def start():
     controller.run()
-    return jsonify({'isRunning': controller.running})
+    return jsonify({'started': controller.running})
 
 
 @app.route("/controller/once")
 @local_only
 def once():
+    runs_before = len(controller.runs)
     controller.run_once()
-    return jsonify({'isRunning': controller.running})
+    runs_after = len(controller.runs)
+    return jsonify({'ran': runs_after > runs_before})
 
 
 @app.route("/controller/stop")
 @local_only
 def stop():
     controller.stop()
-    return jsonify({'isRunning': controller.running})
+    return jsonify({'stopped': controller.running})
 
 
 @app.route("/controller/update")
