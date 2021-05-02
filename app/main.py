@@ -1,21 +1,15 @@
 import os
-
-from flask import Flask, request, jsonify
-
 import webbrowser
 
-from lib.utilities.setup import setup_controller, read_configs_from_yaml_file
+from flask import Flask, jsonify
+
+from lib.utilities.setup import setup_controller, read_configs_from_yaml_file, read_cmdline_args
 from lib.utilities.web import get_params_from_request, local_only
 from lib.view import View
 
-
-
-yaml_file_path = '/Users/joshnicholls/Desktop/SimpleTrader/configs.yaml'
-open_browser = False
-
-
-configs = read_configs_from_yaml_file(yaml_file_path)
-controller = setup_controller(configs, 'BinanceSimpleTrader', test=False)
+args = read_cmdline_args()
+configs = read_configs_from_yaml_file(args.configs)
+controller = setup_controller(configs, args.account, test=args.test_exchange)
 
 web_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'web')
 app = Flask(
@@ -25,8 +19,7 @@ app = Flask(
     template_folder=os.path.join(web_dir, 'templates')
 )
 
-
-if open_browser:
+if args.browser:
     webbrowser.open('http://127.0.0.1:5000')
 
 

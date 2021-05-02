@@ -13,7 +13,7 @@ class BinanceError(Exception):
 
 class Binance:
 
-    BASE_URL = 'https://api.binance.com'
+    LIVE_URL = 'https://api.binance.com'
     TEST_URL = 'https://testnet.binance.vision'
     ENDPOINTS = {
         'klines': '/api/v3/klines',
@@ -29,7 +29,7 @@ class Binance:
     def __init__(self, key, secret, test=False):
         self._key = key
         self._secret = secret
-        self.base = self.TEST_URL if test else self.BASE_URL
+        self.base = self.TEST_URL if test else self.LIVE_URL
 
     @staticmethod
     def _sign_payload(payload, secret):
