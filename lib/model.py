@@ -26,13 +26,7 @@ class Model:
         self.time_series = []
         self.series = {}
         self.params = starting_parameters
-        self.values = {
-            'side': self.params.get('starting_side')
-        }
-
-    def switch_side(self, last_side=None):
-        side = last_side if last_side is not None else self.values.get('side')
-        self.values['side'] = BUY if side == SELL else SELL
+        self.values = {}
 
     def update(self, ticks, capital, last_trade_value, last_side):
         self.series['times'] = [t[0] for t in ticks]
@@ -48,7 +42,7 @@ class Model:
         self.values['sell_limit'] = self.series.get('sell_limits')[-1]
         self.values['buy_limit'] = self.series.get('buy_limits')[-1]
         self.values['last_trade_value'] = last_trade_value
-        self.values['side'] = SELL if last_side == BUY else BUY
+        self.values['side'] = SELL if last_side.lower() == BUY else BUY
         self.values['current_trade_value'] = self.values.get('current_value') * self.params.get('units_to_trade')
 
     def evaluate_strategy(self):

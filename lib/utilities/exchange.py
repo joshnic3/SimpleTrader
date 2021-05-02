@@ -87,7 +87,7 @@ class Binance:
             return balance_map.get(symbol)
         return None
 
-    def get_orders(self, symbol, order_id=None):
+    def get_trades(self, symbol, order_id=None):
         params = {'symbol': symbol}
         if order_id is not None:
             params['orderId'] = order_id
@@ -109,28 +109,28 @@ class Trader:
 
     def __init__(self, exchange):
         self.exchange = exchange
-        self.orders = []
+        self.trades = []
 
     def market_order(self, symbol, side, units):
         order_id = self.exchange.post_market_order(symbol, side, units)
         if order_id:
             order = {'time': datetime.utcnow(), 'id': order_id, 'symbol': symbol.upper(), 'status': 'new'.upper(),
                      'side': side.upper(), 'units': None, 'price': None}
-            self.orders.append(order)
+            self.trades.append(order)
             return order_id
         return None
 
-    def update_orders(self):
-        for i, order in enumerate(self.orders):
-            result = self.exchange.get_orders(order.get('symbol'), order_id=order.get('id'))
+    def update_trades(self):
+        for i, order in enumerate(self.trades):
+            result = self.exchange.get_trades(order.get('symbol'), order_id=order.get('id'))
             if result is not None and len(result) == 1:
                 order_data = result[0]
-                self.orders[i]['status'] = order_data.get('status')
-                self.orders[i]['units'] = order_data.get('executedQty')
-                self.orders[i]['price'] = order_data.get('cummulativeQuoteQty')
+                self.trades[i]['status'] = order_data.get('status')
+                self.trades[i]['units'] = order_data.get('executedQty')
+                self.trades[i]['price'] = order_data.get('cummulativeQuoteQty')
 
     def get_last_order(self, symbol, key=None, keys=None):
-        orders = self.exchange.get_orders(symbol)
+        orders = self.exchange.get_trades(symbol)
         if orders:
             last_order = orders[-1]
             if key is not None:

@@ -23,14 +23,14 @@ class Controller:
         self.errors = []
 
     def _execute(self, run_type):
-        run = {'time': datetime.utcnow(), 'run_type': run_type.upper(), 'order': None, 'error': None}
+        run = {'time': datetime.utcnow(), 'run_type': run_type.upper(), 'trade': None, 'error': None}
         if self.model.evaluate_strategy() and self.model.within_limits():
-            run['order'] = self.trader.market_order(
+            run['trade'] = self.trader.market_order(
                 self.model.params.get('ticker'),
                 self.model.values.get('side'),
                 self.model.params.get('units_to_trade')
             )
-            if run['order'] is None:
+            if run['trade'] is None:
                 run['error'] = 'Failed to place order!'
                 self.errors.append('Failed to place order!')
         self.runs.append(run)

@@ -10,7 +10,7 @@
                     <select class="form-select form-select-sm filter-select" onchange="filter('{{ header }}', this.value)">
                         <option value='null' selected>{{ header }}</option>
 <!--                        <optgroup label="Remove">-->
-<!--                            <option value='null'>Null Values</option>-->
+<!--                            <option value='-'>Null Values</option>-->
 <!--                        </optgroup>-->
                         <optgroup label="Sort By">
                         {% for value in filters[header] %}

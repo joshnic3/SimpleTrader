@@ -64,7 +64,7 @@ def update():
         'status': {
             'isRunning': controller.running,
             'runCount': len(controller.runs),
-            'orderCount': len(controller.trader.orders),
+            'orderCount': len(controller.trader.trades),
             'errorCount': len(controller.errors),
             'exchangeApi': controller.trader.exchange.base
         }
@@ -72,17 +72,19 @@ def update():
     return jsonify(data)
 
 
-@app.route("/view/runs")
+@app.route("/view/runs", methods=['GET'])
 @local_only
 def get_runs():
-    return View.runs_html(controller)
+    limit = get_params_from_request('limit', cast=int)
+    return View.runs_html(controller, limit=limit)
 
 
-@app.route("/view/orders")
+@app.route("/view/trades", methods=['GET'])
 @local_only
 def get_orders():
-    controller.trader.update_orders()
-    return View.orders_html(controller)
+    limit = get_params_from_request('limit', cast=int)
+    controller.trader.update_trades()
+    return View.trades_html(controller, limit=limit)
 
 
 @app.route("/", methods=['GET'])

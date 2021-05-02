@@ -145,7 +145,7 @@ function runOnce() {
    runButton.classList.add("disabled");
     runButton.classList.add("btn-warning");
     runButton.classList.remove("btn-success");
-    runButton.innerHTML = 'Running once...';
+    runButton.innerHTML = 'Executing...';
     runButton.blur();
     postRequest('/controller/once', ranOnceCallback);
 }
@@ -186,9 +186,10 @@ function updateController() {
     fetch(request).then(function (response) {
         return response.json();
     }).then(function (data) {
-//        console.log(data.status)
-        orderCountDiv = document.getElementById("ordersLink");
+        console.log(data.status)
+        orderCountDiv = document.getElementById("tradesLink");
         runCountDiv = document.getElementById("runsLink");
+        tradeCount = document.getElementById("tradeCount");
         if (data.status.isRunning) {
             running(data.status);
         } else {
@@ -196,6 +197,7 @@ function updateController() {
         }
         if (data.status.orderCount != orderCountDiv.title) {
             orderCountDiv.title = data.status.orderCount;
+            tradeCount.innerHTML = data.status.orderCount;
         }
         if (data.status.runCount != runCountDiv.title) {
             runCountDiv.title = data.status.runCount;
@@ -209,6 +211,7 @@ function updateController() {
             runCountDiv.classList.remove('disabled');
         }
         }).catch(function (err) {
+            console.log(err);
             alert("Lost connection to controller! Ensure server is running and then press OK");
             dismissWarm();
         });
@@ -217,7 +220,7 @@ function updateController() {
 
 function clearActiveTabs() {
     document.getElementById('runsLink').classList.remove('active');
-    document.getElementById('ordersLink').classList.remove('active');
+    document.getElementById('tradesLink').classList.remove('active');
 }
 
 function showControllerTab(view) {
@@ -226,7 +229,7 @@ function showControllerTab(view) {
 
     link = document.getElementById(view+'Link');
     runsLink = document.getElementById('runsLink');
-    ordersLink = document.getElementById('ordersLink');
+    tradesLink = document.getElementById('tradesLink');
     frame.src = "http://127.0.0.1:5000/view/" + view;
 
     clearActiveTabs();
