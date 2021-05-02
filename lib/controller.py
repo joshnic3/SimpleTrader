@@ -69,6 +69,19 @@ class Controller:
     def return_static_model(self):
         return self.model
 
+    def modify_parameter(self, key, value):
+        old_value = self.model.params.get(key)
+        if old_value is None:
+            return None
+        try:
+            self.model.params[key] = type(old_value)(value)
+        except TypeError:
+            return None
+        except ValueError:
+            return None
+        return self.model.params.get(key)
+
+
 
 
 

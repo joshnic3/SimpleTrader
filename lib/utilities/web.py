@@ -14,6 +14,8 @@ def get_params_from_request(key, cast=None):
             return None
         except ValueError:
             return None
+    else:
+        return value
 
 
 def local_only(f):

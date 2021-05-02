@@ -23,19 +23,34 @@ function postRequest(endpoint, callback) {
     });
 }
 
+
 function editParamModal(key, value) {
-    editModal = document.getElementById("editModal");
-    newValueInput = document.getElementById("newValueInput");
-    paramKey = document.getElementById("paramKey");
-    editModal.classList.add('show');
-    newValueInput.value = value;
-    paramKey.innerHTML = key;
-//    postRequest("/modal/edit?key=" + key, );
+    document.getElementById("editModal").classList.add('show');
+    document.getElementById("newValueInput").value = value;
+    document.getElementById("paramKey").innerHTML = key;
 }
 
 function closeEditParamModel() {
     editModal = document.getElementById("editModal");
     editModal.classList.remove('show');
+}
+
+function modify() {
+    key = document.getElementById("paramKey").innerHTML;
+    value = document.getElementById("newValueInput").value;
+    closeEditParamModel();
+    console.log('Modifying ' + key + ': ' + value);
+    endpoint = "/controller/modify?k=" + key + "&v=" + value;
+    console.log(endpoint);
+    postRequest(endpoint, modifyCallback);
+}
+
+function modifyCallback(data) {
+    if ('error' in data) {
+        warn(data.error);
+    } else {
+        success('<strong>Modified Parameter</strong>: ' + data.modified.key + ': ' + data.modified.value);
+    }
 }
 
 function running(data) {
@@ -143,11 +158,23 @@ function warn(message) {
     }
 }
 
+function success(message) {
+    successAlert = document.getElementById("successAlert");
+    if (successAlert != null) {
+        successAlert.classList.remove("collapse");
+        document.getElementById("successAlertMessage").innerHTML = message;
+    }
+}
+
 function dismissWarm() {
     warningAlert = document.getElementById("warningAlert");
     warningAlert.classList.add("collapse");
 }
 
+function dismissSuccess() {
+    successAlert = document.getElementById("successAlert");
+    successAlert.classList.add("collapse");
+}
 
 function refreshRunView() {
     runReportFrame = document.getElementById('runReport')

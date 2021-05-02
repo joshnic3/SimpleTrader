@@ -14,14 +14,14 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Edit Parameter</h5>
+                        <h5 class="modal-title" id="editModalLabel">Modify Parameter</h5>
                         <button type="button" class="btn-close" onclick="closeEditParamModel()" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <h5 id="paramKey">{{key}}</h5>
                         <div class="input-group input-group-sm">
                             <input id="newValueInput" type="text" class="form-control" aria-describedby="newValueInputLabel">
-                            <button type="button" class="btn btn-outline-primary">Save</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="modify()">Save</button>
                         </div>
                     </div>
                 </div>
@@ -33,6 +33,10 @@
                     <div id="warningAlert" class="alert alert-dismissible alert-warning collapse" role="alert">
                         <div id="warningAlertMessage"><strong>Warning!</strong> Example warning message.</div>
                         <button type="button" class="btn-close" onclick="dismissWarm()"></button>
+                    </div>
+                    <div id="successAlert" class="alert alert-dismissible alert-success collapse" role="alert">
+                        <div id="successAlertMessage"><strong>Success</strong> Example success message.</div>
+                        <button type="button" class="btn-close" onclick="dismissSuccess()"></button>
                     </div>
                 </div>
             </div>

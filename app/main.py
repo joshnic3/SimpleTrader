@@ -27,7 +27,7 @@ app = Flask(
 
 
 if open_browser:
-    webbrowser.open('http://0.0.0.0:5000')
+    webbrowser.open('http://127.0.0.1:5000')
 
 
 @app.route("/controller/start")
@@ -51,6 +51,17 @@ def once():
 def stop():
     controller.stop()
     return jsonify({'stopped': not controller.running})
+
+
+@app.route("/controller/modify")
+@local_only
+def modify_parameter():
+    key = get_params_from_request('k')
+    if controller.model.params.get(key) is None:
+        return jsonify({'error': 'Invalid key: {}'.format(key)})
+    value = get_params_from_request('v')
+    result = controller.modify_parameter(key, value)
+    return jsonify({'modified': {'key': key, 'value': result}})
 
 
 @app.route("/controller/update")
@@ -94,5 +105,5 @@ def view():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='127.0.0.1', debug=True)
 
