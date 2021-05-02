@@ -166,23 +166,15 @@
         refresh();
 
         function refresh() {
-            heartbeat = document.getElementById("heartbeat");
             updateModel(graph);
             updateController();
-            var datetime = new Date().toLocaleTimeString();
-            heartbeat.innerHTML = datetime;
         }
 
         window.onload = function(){
             if ({{ static }}) {
                 warn('All data on this page is static and will not be updated.');
-                document.getElementById("heartbeat").classList.add("bg-warning");
-                document.getElementById("heartbeat").classList.add("text-dark");
-                document.getElementById("heartbeat").innerHTML = "STATIC";
-                document.getElementById("runButton").disabled = true;
-                document.getElementById("runOptions").disabled = true;
+                static();
             } else {
-                document.getElementById("heartbeat").classList.add("bg-primary");
                 setInterval(refresh, {{ refresh_interval * 1000 }});
             }
         };

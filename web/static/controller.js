@@ -209,9 +209,10 @@ function updateController() {
             runCountDiv.classList.remove('disabled');
         }
         }).catch(function (err) {
-            warn('Bad View Request: ' + err);
-            console.warn('Something went wrong.', err);
+            alert("Lost connection to controller! Ensure server is running and then press OK");
+            dismissWarm();
         });
+        live();
 }
 
 function clearActiveTabs() {
@@ -232,4 +233,23 @@ function showControllerTab(view) {
     link.classList.add('active');
     collapseControllerView.classList.add('show');
 
+}
+
+function static() {
+    heartbeat = document.getElementById("heartbeat");
+    heartbeat.classList.add("bg-warning");
+    heartbeat.classList.add("text-dark");
+    heartbeat.innerHTML = "STATIC";
+    document.getElementById("runButton").disabled = true;
+    document.getElementById("runOptions").disabled = true;
+}
+
+function live() {
+    heartbeat = document.getElementById("heartbeat");
+    heartbeat.classList.add("bg-primary");
+    heartbeat.classList.remove("bg-warning");
+    heartbeat.classList.remove("text-dark");
+    heartbeat.innerHTML = new Date().toLocaleTimeString();
+    document.getElementById("runButton").disabled = false;
+    document.getElementById("runOptions").disabled = false;
 }
