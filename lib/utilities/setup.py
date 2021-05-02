@@ -13,6 +13,7 @@ def read_cmdline_args():
     parser.add_argument('-c', '--configs', required=True, help="YAML configuration file path.")
     parser.add_argument('-a', '--account', required=True, help="Exchange account.")
     parser.add_argument('-b', '--browser', default=False, action='store_true', help="Opens client in browser on start.")
+    parser.add_argument('-d', '--debug', default=False, action='store_true', help="Debug mode.")
     parser.add_argument('-t', '--test_exchange', default=False, action='store_true', help="Runs against test exchange API.")
     return parser.parse_args()
 

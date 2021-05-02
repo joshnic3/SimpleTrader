@@ -19,9 +19,6 @@ app = Flask(
     template_folder=os.path.join(web_dir, 'templates')
 )
 
-if args.browser:
-    webbrowser.open('http://127.0.0.1:5000')
-
 
 @app.route("/controller/start")
 @local_only
@@ -98,5 +95,8 @@ def view():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', debug=True)
+    if args.browser:
+        webbrowser.open('http://127.0.0.1:5000')
+    app.run(host='127.0.0.1', debug=args.debug)
+
 
