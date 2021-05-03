@@ -82,7 +82,7 @@ class View:
         if controller.runs:
             headers = ['time', 'run_type', 'trade', 'error']
             for run in controller.runs:
-                run['trade'] = None if run['trade'] is None else str(run.get('trade'))
+                run['trade'] = None if run.get('trade') is None else str(run.get('trade'))
             return html_table(controller.runs[:limit], headers, datatime_format='%H:%M:%S', replace_none='-')
         return '<p>No Runs</p>'
 

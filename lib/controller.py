@@ -24,7 +24,9 @@ class Controller:
 
     def _execute(self, run_type):
         run = {'time': datetime.utcnow(), 'run_type': run_type.upper(), 'trade': None, 'error': None}
-        if self.model.evaluate_strategy() and self.model.within_limits():
+        should_trade = self.model.evaluate_strategy()
+        within_limits = self.model.within_limits()
+        if should_trade and within_limits:
             run['trade'] = self.trader.market_order(
                 self.model.params.get('ticker'),
                 self.model.values.get('side'),
