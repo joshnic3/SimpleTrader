@@ -50,28 +50,49 @@ class Model:
         self.values['last_update'] = datetime.utcnow()
 
     def evaluate_strategy(self):
-        if self.values['side'] == SELL:
-            if self.values['last_trade_value'] > self.values.get('current_trade_value'):
-                return False
+        # if self.values['side'] == SELL:
+        #     # Base these on rolling momentum. "Momentum shows the rate of change in price movement over a period of time to help investors determine the strength of a trend"
+        #     if self.values.get('last_trade_value') > self.values.get('current_trade_value'):
+        #         print('STRATEGY, DONT SELL, last_trade_value({}) > current_trade_value({})'.format(
+        #             self.values.get('last_trade_value'),
+        #             self.values.get('current_trade_value')
+        #         ))
+        #         return False
+        #
+        # if self.values['side'] == BUY:
+        #     if self.values['last_trade_value'] < self.values.get('current_trade_value'):
+        #         print('STRATEGY, DONT BUY, last_trade_value({}) < current_trade_value({})'.format(
+        #             self.values.get('last_trade_value'),
+        #             self.values.get('current_trade_value')
+        #         ))
+        #         return False
 
         if self.values['side'] == BUY:
-            if self.values['last_trade_value'] < self.values.get('current_trade_value'):
-                return False
-
-        if self.values['side'] == BUY:
-            return self.values.get('current_value') < self.values.get('buy_limit')
+            buy = self.values.get('current_value') < self.values.get('buy_limit')
+            print('STRATEGY, BUY, {}'.format(str(buy)))
+            return buy
         elif self.values['side'] == SELL:
-            return self.values.get('current_value') > self.values.get('sell_limit')
+            sell = self.values.get('current_value') > self.values.get('sell_limit')
+            print('STRATEGY, SELL, {}'.format(str(sell)))
+            return sell
         else:
             return False
 
     def within_limits(self):
         # Value trajectory(gradient) needs to be positive over this run period.
-        if self.values['trajectory'] < self.params.get('trajectory_limit'):
+        if self.values.get('trajectory') < self.params.get('trajectory_limit'):
+            print('LIMITS, trajectory({}) < trajectory_limit({})'.format(
+                self.values.get('trajectory'),
+                self.params.get('trajectory_limit')
+            ))
             return False
 
         # Cost of trade cannot be more then our available capital.
-        if self.values.get('current_value') * self.params.get('units_to_trade') > self.values.get('capital'):
+        if self.values.get('current_trade_value') > self.values.get('capital'):
+            print('LIMITS, current_trade_value({}) > capital({})'.format(
+                self.values.get('current_trade_value'),
+                self.params.get('capital')
+            ))
             return False
 
         # If we got here all is good.
