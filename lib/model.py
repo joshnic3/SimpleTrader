@@ -23,27 +23,31 @@ def trajectory(values):
 class Model:
 
     def __init__(self, starting_parameters):
-        self.time_series = []
         self.series = {}
         self.params = starting_parameters
         self.values = {}
 
     def update(self, ticks, capital, last_trade_value, last_side):
         self.series['times'] = [t[0] for t in ticks]
-        self.series['values'] = [t[1] for t in ticks]
-        self.values['last_update'] = datetime.utcnow()
-        self.values['trajectory'] = trajectory(self.series['values'])
-        self.values['current_value'] = self.series['values'][-1]
-        self.values['rolling_mean'] = mean(self.series['values'])
-        self.values['std_dev'] = stdev(self.series['values'])
-        self.values['capital'] = capital
-        self.series['sell_limits'] = [self.values.get('rolling_mean') + self.values.get('std_dev') * self.params.get('sell_appetite') for v in self.series.get('values')]
-        self.series['buy_limits'] = [self.values.get('rolling_mean') - self.values.get('std_dev') * self.params.get('buy_appetite') for v in self.series.get('values')]
+        self.series['ticks'] = [t[1] for t in ticks]
+
+        self.values['std_dev'] = stdev(self.series['ticks'])
+
+        self.series['rolling_mean'] = [mean(self.series.get('ticks')[:i]) if i > 0 else v for i,  v in enumerate(self.series.get('ticks'))]
+        self.series['sell_limits'] = [m + self.values.get('std_dev') * self.params.get('sell_appetite') for m in self.series.get('rolling_mean')]
+        self.series['buy_limits'] = [m - self.values.get('std_dev') * self.params.get('buy_appetite') for m in self.series.get('rolling_mean')]
+
         self.values['sell_limit'] = self.series.get('sell_limits')[-1]
         self.values['buy_limit'] = self.series.get('buy_limits')[-1]
+        self.values['rolling_mean'] = self.series.get('rolling_mean')[-1]
+        self.values['current_value'] = self.series.get('ticks')[-1]
+
+        self.values['capital'] = capital
         self.values['last_trade_value'] = last_trade_value
         self.values['side'] = SELL if last_side.lower() == BUY else BUY
+        self.values['trajectory'] = trajectory(self.series['ticks'])
         self.values['current_trade_value'] = self.values.get('current_value') * self.params.get('units_to_trade')
+        self.values['last_update'] = datetime.utcnow()
 
     def evaluate_strategy(self):
         if self.values['side'] == SELL:
@@ -75,7 +79,6 @@ class Model:
 
     def as_dict(self):
         return {
-            'time_series': self.time_series,
             'params': self.params,
             'values': self.values,
             'series': self.series

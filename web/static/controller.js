@@ -186,7 +186,7 @@ function updateController() {
     fetch(request).then(function (response) {
         return response.json();
     }).then(function (data) {
-        console.log(data.status)
+//        console.log(data.status)
         orderCountDiv = document.getElementById("tradesLink");
         runCountDiv = document.getElementById("runsLink");
         tradeCount = document.getElementById("tradeCount");
