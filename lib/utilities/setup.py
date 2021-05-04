@@ -1,11 +1,17 @@
 from argparse import ArgumentParser
 from datetime import datetime
 
+from logging import INFO, getLogger, StreamHandler, Formatter, FileHandler
+
+
 import yaml
 
 from lib.controller import Controller
 from lib.model import Model
 from lib.utilities.exchange import Trader, Binance
+
+import os
+import sys
 
 
 def read_cmdline_args():
@@ -23,7 +29,7 @@ def read_configs_from_yaml_file(yaml_file_path):
         return yaml.load(yaml_file, Loader=yaml.FullLoader)
 
 
-def setup_controller(configs, exchange_account, test=False):
+def configure_controller(configs, exchange_account, test=False):
     _account = configs.get('exchange').get(exchange_account)
     _exchange = Binance(_account.get('key'), _account.get('secret'), test=test)
     _trader = Trader(_exchange)
@@ -31,9 +37,23 @@ def setup_controller(configs, exchange_account, test=False):
     return Controller(_model, _trader)
 
 
-def handshake_key():
-    return datetime.now().strftime('%Y%m%d%H%M%S%f')
+def setup_logger(name, log_path, level=INFO):
+    name = '{}_{}.log'.format(name, datetime.now().strftime('%Y%m%d_%H%M%S'))
+    path = os.path.join(log_path, name)
 
+    logger = getLogger()
+    logger.setLevel(level)
 
-def handshake_url(key):
-    return 'http://localhost:5000/handshake?k={}'.format(key)
+    formatter = Formatter('%(asctime)s, %(levelname)s, %(name)s, %(message)s')
+
+    file_handler = FileHandler("{0}_{1}.log".format(path, name))
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(level)
+    logger.addHandler(file_handler)
+
+    console_handler = StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(level)
+    logger.addHandler(console_handler)
+
+    return logger

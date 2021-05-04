@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 from datetime import datetime
+from logging import getLogger
 from operator import itemgetter
 from urllib.parse import urlencode
 
@@ -108,6 +109,7 @@ class Binance:
 class Trader:
 
     def __init__(self, exchange):
+        self._log = getLogger('trader')
         self.exchange = exchange
         self.trades = []
 
@@ -117,10 +119,14 @@ class Trader:
             order = {'time': datetime.utcnow(), 'id': order_id, 'symbol': symbol.upper(), 'status': 'new'.upper(),
                      'side': side.upper(), 'units': None, 'price': None}
             self.trades.append(order)
+            self._log.info('order, {}'.format(', '.join(['{}: {}'.format(k, v) for k, v in order.items()])))
             return order_id
-        return None
+        else:
+            self._log.warn('Failed to place order!, symbol: {}, side: {}, units: {}'.format(symbol, side, units))
+            return None
 
     def update_trades(self):
+        updated = 0
         for i, order in enumerate(self.trades):
             result = self.exchange.get_trades(order.get('symbol'), order_id=order.get('id'))
             if result is not None and len(result) == 1:
@@ -128,6 +134,8 @@ class Trader:
                 self.trades[i]['status'] = order_data.get('status')
                 self.trades[i]['units'] = order_data.get('executedQty')
                 self.trades[i]['price'] = order_data.get('cummulativeQuoteQty')
+                updated += 1
+        self._log.info('trades, updated: {}'.format(updated))
 
     def get_last_order(self, symbol, key=None, keys=None):
         orders = self.exchange.get_trades(symbol)

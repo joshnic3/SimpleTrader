@@ -1,6 +1,8 @@
 import time
 from datetime import datetime
 
+from logging import getLogger
+
 
 def runner(controller, interval):
     print('running')
@@ -16,6 +18,7 @@ def runner(controller, interval):
 class Controller:
 
     def __init__(self, model, trader):
+        self._log = getLogger('controller')
         self.model = model
         self.trader = trader
         self.running = False
@@ -26,16 +29,23 @@ class Controller:
         run = {'time': datetime.utcnow(), 'run_type': run_type.upper(), 'trade': None, 'error': None}
         should_trade = self.model.evaluate_strategy()
         within_limits = self.model.within_limits()
+
         if should_trade and within_limits:
-            run['trade'] = self.trader.market_order(
+            trade = self.trader.market_order(
                 self.model.params.get('ticker'),
                 self.model.values.get('side'),
                 self.model.params.get('units_to_trade')
             )
-            if run['trade'] is None:
-                run['error'] = 'Failed to place order!'
+            if trade is None:
+                run['error'] = 'Failed to trade!'
+                self._log.warn('TRADE FAILED!')
                 self.errors.append('Failed to place order!')
         self.runs.append(run)
+
+        # Log execution.
+        self._log.info('executed, should_trade: {}, within_limits: {}, trade'.format(
+            should_trade, within_limits, run.get('trade')
+        ))
 
     def update_model(self):
         try:
@@ -58,25 +68,26 @@ class Controller:
 
     def run_once(self):
         self._execute('manual')
-        print('RUN ONCE')
+        self._log.info('run once')
 
     def run(self):
         self.running = True
-        print('RUNNING')
+        self._log.info('running')
 
     def stop(self):
         self.running = False
-        print('STOPPED')
+        self._log.info('stopped')
 
     def return_static_model(self):
         return self.model
 
-    def modify_parameter(self, key, value):
+    def modify_parameter(self, key, new_value):
         old_value = self.model.params.get(key)
         if old_value is None:
             return None
         try:
-            self.model.params[key] = type(old_value)(value)
+            self.model.params[key] = type(old_value)(new_value)
+            self._log.info('modified_parameter, key: {}, old: {}, new: {}'.format(key, old_value, new_value))
         except TypeError:
             return None
         except ValueError:

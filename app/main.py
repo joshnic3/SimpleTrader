@@ -3,13 +3,9 @@ import webbrowser
 
 from flask import Flask, jsonify
 
-from lib.utilities.setup import setup_controller, read_configs_from_yaml_file, read_cmdline_args
+from lib.utilities.setup import configure_controller, read_configs_from_yaml_file, read_cmdline_args, setup_logger
 from lib.utilities.web import get_params_from_request, local_only
 from lib.view import View
-
-args = read_cmdline_args()
-configs = read_configs_from_yaml_file(args.configs)
-controller = setup_controller(configs, args.account, test=args.test_exchange)
 
 web_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'web')
 app = Flask(
@@ -97,8 +93,15 @@ def view():
 
 
 if __name__ == '__main__':
+    args = read_cmdline_args()
+    configs = read_configs_from_yaml_file(args.configs)
+
+    setup_logger('server', configs.get('logs'))
+    controller = configure_controller(configs, args.account, test=args.test_exchange)
+
     if args.browser:
         webbrowser.open('http://127.0.0.1:5000')
+
     app.run(host='127.0.0.1', debug=args.debug)
 
 
