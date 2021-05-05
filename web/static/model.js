@@ -43,6 +43,7 @@ const CHART_INITIAL_CONFIG = {
         data: [],
         borderColor: 'rgb(255, 0, 255)',
         borderWidth: 1.0,
+        tension: 0.25,
         fill: false,
         pointRadius: 0,
       },

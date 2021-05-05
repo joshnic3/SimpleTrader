@@ -106,6 +106,8 @@ function updateController(status) {
     if (status.orderCount != orderCountDiv.title) {
         orderCountDiv.title = status.orderCount;
         tradeCount.innerHTML = status.orderCount;
+        tradeCount.classList.add('bg-warning');
+        tradeCount.classList.remove('bg-secondary');
     }
     if (status.runCount != runCountDiv.title) {
         runCountDiv.title = status.runCount;

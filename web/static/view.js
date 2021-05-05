@@ -101,6 +101,7 @@ function dismissSuccess() {
 function showControllerTab(view) {
     frame = document.getElementById('controllerFrame');
     collapseControllerView = document.getElementById('collapseControllerView');
+    tradeCount = document.getElementById('tradeCount');
 
     link = document.getElementById(view+'Link');
     runsLink = document.getElementById('runsLink');
@@ -110,6 +111,11 @@ function showControllerTab(view) {
     clearActiveTabs();
     link.classList.add('active');
     collapseControllerView.classList.add('show');
+
+    if (view == 'trades') {
+        tradeCount.classList.remove('bg-warning');
+        tradeCount.classList.add('bg-secondary');
+    }
 }
 
 function clearActiveTabs() {

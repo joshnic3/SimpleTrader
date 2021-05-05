@@ -166,17 +166,13 @@
 
 {% block javascript %}
     <script>
-        <!-- Move to onload, before static condition -->
-        var graph = new Chart(document.getElementById('graph'), {type: 'line', data: CHART_INITIAL_CONFIG, options: CHART_OPTIONS});
-        refresh();
-
         function refresh() {
             update(graph);
-<!--            updateModel(graph);-->
-<!--            updateController();-->
         }
 
         window.onload = function(){
+            graph = new Chart(document.getElementById('graph'), {type: 'line', data: CHART_INITIAL_CONFIG, options: CHART_OPTIONS});
+            refresh();
             if ({{ static }}) {
                 warn('All data on this page is static and will not be updated.');
                 static();

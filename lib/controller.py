@@ -29,11 +29,11 @@ class Controller:
         run = {'time': datetime.utcnow(), 'run_type': run_type.upper(), 'trade': None, 'error': None}
         should_trade = self.model.evaluate_strategy()
         within_limits = self.model.within_limits()
-        self._log.info('executed, should_trade: {}, within_limits: {}, trade'.format(
-            should_trade, within_limits, run.get('trade')
-        ))
-
+        self._log.info('executed, should_trade: {}, within_limits: {}'.format(should_trade, within_limits))
         if should_trade and within_limits:
+            self._log.info('values, {}'.format(
+                ', '.join(['{}: {}'.format(k, v) for k, v in self.model.values.items()]))
+            )
             trade = self.trader.market_order(
                 self.model.params.get('ticker'),
                 self.model.values.get('side'),
