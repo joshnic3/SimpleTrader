@@ -7,6 +7,7 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="/model.js"></script>
         <script src="/controller.js"></script>
+        <script src="/view.js"></script>
     </head>
 
     <body>
@@ -165,12 +166,14 @@
 
 {% block javascript %}
     <script>
+        <!-- Move to onload, before static condition -->
         var graph = new Chart(document.getElementById('graph'), {type: 'line', data: CHART_INITIAL_CONFIG, options: CHART_OPTIONS});
         refresh();
 
         function refresh() {
-            updateModel(graph);
-            updateController();
+            update(graph);
+<!--            updateModel(graph);-->
+<!--            updateController();-->
         }
 
         window.onload = function(){
@@ -185,7 +188,8 @@
 {% endblock %}
 
 <style>
-     .list-card { overflow-x: scroll; min-width: 50px;  max-height:33vh;}
+    .card {min-width: 200px !important;}
+    .card-body {max-height: 35vh; overflow-y: scroll;}
     .show {display: block;}
     .spinner-border {animation-duration: 1.5s;}
     .run-table {font-size:12px;}

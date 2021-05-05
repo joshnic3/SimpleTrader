@@ -29,6 +29,9 @@ class Controller:
         run = {'time': datetime.utcnow(), 'run_type': run_type.upper(), 'trade': None, 'error': None}
         should_trade = self.model.evaluate_strategy()
         within_limits = self.model.within_limits()
+        self._log.info('executed, should_trade: {}, within_limits: {}, trade'.format(
+            should_trade, within_limits, run.get('trade')
+        ))
 
         if should_trade and within_limits:
             trade = self.trader.market_order(
@@ -38,14 +41,8 @@ class Controller:
             )
             if trade is None:
                 run['error'] = 'Failed to trade!'
-                self._log.warn('TRADE FAILED!')
                 self.errors.append('Failed to place order!')
         self.runs.append(run)
-
-        # Log execution.
-        self._log.info('executed, should_trade: {}, within_limits: {}, trade'.format(
-            should_trade, within_limits, run.get('trade')
-        ))
 
     def update_model(self):
         try:

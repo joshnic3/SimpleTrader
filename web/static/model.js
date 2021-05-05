@@ -62,7 +62,6 @@ const CHART_OPTIONS = {
 };
 
 function updateGraph(model, graph) {
-    console.log('Updating Graph');
     graph.data.labels = [];
     graph.data.datasets[0].label = 'ticks';
     for (i = 0; i < model.series.times.length; i++) {
@@ -76,24 +75,8 @@ function updateGraph(model, graph) {
     graph.update();
 }
 
-function updateList(model, list_key) {
+function updateTable(model, list_key) {
     for (key in model[list_key]) {
         document.getElementById(key).innerHTML = model[list_key][key];
     }
-}
-
-function updateModel(graph) {
-    const request = new Request('http://127.0.0.1:5000/controller/update');
-    fetch(request).then(function (response) {
-        response = response.json();
-        return response;
-    }).then(function (response) {
-        model = response.model;
-        updateGraph(model, graph);
-        updateList(model, 'params');
-        updateList(model, 'values');
-    }).catch(function (err) {
-        warn('Bad View Request: ' + err);
-        console.warn('Something went wrong.', err);
-    });
 }
