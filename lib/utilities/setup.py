@@ -57,3 +57,5 @@ def setup_logger(name, log_path, level=INFO):
     logger.addHandler(console_handler)
 
     return logger
+
+

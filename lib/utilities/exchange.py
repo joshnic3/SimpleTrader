@@ -7,6 +7,8 @@ from urllib.parse import urlencode
 
 import requests
 
+from lib.utilities.misc import dict_to_string
+
 
 class BinanceError(Exception):
     pass
@@ -112,6 +114,16 @@ class Trader:
         self._log = getLogger('trader')
         self.exchange = exchange
         self.trades = []
+        self.pnl = 0
+
+    def _update_pnl(self):
+        pnl = 0
+        for trade in self.trades:
+            if trade.get('side') == 'SELL':
+                pnl += trade.get('price')
+            if trade.get('side') == 'BUY':
+                pnl -= trade.get('price')
+        self.pnl = pnl
 
     def market_order(self, symbol, side, units):
         order_id = self.exchange.post_market_order(symbol, side, units)
@@ -125,7 +137,7 @@ class Trader:
             self._log.warn('Failed to place order!, symbol: {}, side: {}, units: {}'.format(symbol, side, units))
             return None
 
-    def update_trades(self):
+    def update(self):
         updated = 0
         for i, order in enumerate(self.trades):
             result = self.exchange.get_trades(order.get('symbol'), order_id=order.get('id'))
@@ -135,7 +147,8 @@ class Trader:
                 self.trades[i]['units'] = order_data.get('executedQty')
                 self.trades[i]['price'] = order_data.get('cummulativeQuoteQty')
                 updated += 1
-        self._log.info('trades, updated: {}'.format(updated))
+        self._update_pnl()
+        self._log.info('updated, {}'.format(dict_to_string({"pnl": self.pnl, 'trades': updated})))
 
     def get_last_order(self, symbol, key=None, keys=None):
         orders = self.exchange.get_trades(symbol)

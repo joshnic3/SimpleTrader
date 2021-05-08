@@ -98,6 +98,7 @@ function updateController(status) {
     orderCountDiv = document.getElementById("tradesLink");
     runCountDiv = document.getElementById("runsLink");
     tradeCount = document.getElementById("tradeCount");
+    console.log(status);
     if (status.isRunning) {
         running(status.isRunning);
     } else {

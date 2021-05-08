@@ -62,7 +62,8 @@ def update():
             'runCount': len(controller.runs),
             'orderCount': len(controller.trader.trades),
             'errorCount': len(controller.errors),
-            'exchangeApi': controller.trader.exchange.base
+            'exchangeApi': controller.trader.exchange.base,
+            'sessionPnl': controller.trader.pnl
         }
     }
     return jsonify(data)
@@ -79,7 +80,7 @@ def get_runs():
 @local_only
 def get_orders():
     limit = get_params_from_request('limit', cast=int)
-    controller.trader.update_trades()
+    controller.trader.update()
     return View.trades_html(controller, limit=limit)
 
 
