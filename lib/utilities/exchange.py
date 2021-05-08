@@ -1,10 +1,13 @@
 import hashlib
 import hmac
 from datetime import datetime
+from logging import getLogger
 from operator import itemgetter
 from urllib.parse import urlencode
 
 import requests
+
+from lib.utilities.misc import dict_to_string
 
 
 class BinanceError(Exception):
@@ -13,7 +16,7 @@ class BinanceError(Exception):
 
 class Binance:
 
-    BASE_URL = 'https://api.binance.com'
+    LIVE_URL = 'https://api.binance.com'
     TEST_URL = 'https://testnet.binance.vision'
     ENDPOINTS = {
         'klines': '/api/v3/klines',
@@ -29,7 +32,7 @@ class Binance:
     def __init__(self, key, secret, test=False):
         self._key = key
         self._secret = secret
-        self.base = self.TEST_URL if test else self.BASE_URL
+        self.base = self.TEST_URL if test else self.LIVE_URL
 
     @staticmethod
     def _sign_payload(payload, secret):
@@ -87,7 +90,7 @@ class Binance:
             return balance_map.get(symbol)
         return None
 
-    def get_orders(self, symbol, order_id=None):
+    def get_trades(self, symbol, order_id=None):
         params = {'symbol': symbol}
         if order_id is not None:
             params['orderId'] = order_id
@@ -108,29 +111,47 @@ class Binance:
 class Trader:
 
     def __init__(self, exchange):
+        self._log = getLogger('trader')
         self.exchange = exchange
-        self.orders = []
+        self.trades = []
+        self.pnl = 0
+
+    def _update_pnl(self):
+        pnl = 0
+        for trade in self.trades:
+            if trade.get('side') == 'SELL':
+                pnl += trade.get('price')
+            if trade.get('side') == 'BUY':
+                pnl -= trade.get('price')
+        self.pnl = pnl
 
     def market_order(self, symbol, side, units):
         order_id = self.exchange.post_market_order(symbol, side, units)
         if order_id:
             order = {'time': datetime.utcnow(), 'id': order_id, 'symbol': symbol.upper(), 'status': 'new'.upper(),
                      'side': side.upper(), 'units': None, 'price': None}
-            self.orders.append(order)
+            self.trades.append(order)
+            self._log.info('order, {}'.format(', '.join(['{}: {}'.format(k, v) for k, v in order.items()])))
             return order_id
-        return None
+        else:
+            self._log.warn('Failed to place order!, symbol: {}, side: {}, units: {}'.format(symbol, side, units))
+            return None
 
-    def update_orders(self):
-        for i, order in enumerate(self.orders):
-            result = self.exchange.get_orders(order.get('symbol'), order_id=order.get('id'))
+    def update(self):
+        updated = 0
+        for i, order in enumerate(self.trades):
+            result = self.exchange.get_trades(order.get('symbol'), order_id=order.get('id'))
             if result is not None and len(result) == 1:
                 order_data = result[0]
-                self.orders[i]['status'] = order_data.get('status')
-                self.orders[i]['units'] = order_data.get('executedQty')
-                self.orders[i]['price'] = order_data.get('cummulativeQuoteQty')
+                self.trades[i]['status'] = order_data.get('status')
+                self.trades[i]['units'] = order_data.get('executedQty')
+                self.trades[i]['price'] = order_data.get('cummulativeQuoteQty')
+                updated += 1
+        self._update_pnl()
+        self._log.info('updated, {}'.format(dict_to_string({"pnl": self.pnl, 'trades': updated})))
 
     def get_last_order(self, symbol, key=None, keys=None):
-        orders = self.exchange.get_orders(symbol)
+        orders = self.exchange.get_trades(symbol)
         if orders:
             last_order = orders[-1]
             if key is not None:

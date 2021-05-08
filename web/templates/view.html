@@ -7,6 +7,7 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="/model.js"></script>
         <script src="/controller.js"></script>
+        <script src="/view.js"></script>
     </head>
 
     <body>
@@ -14,25 +15,29 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Edit Parameter</h5>
+                        <h5 class="modal-title" id="editModalLabel">Modify Parameter</h5>
                         <button type="button" class="btn-close" onclick="closeEditParamModel()" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <h5 id="paramKey">{{key}}</h5>
                         <div class="input-group input-group-sm">
                             <input id="newValueInput" type="text" class="form-control" aria-describedby="newValueInputLabel">
-                            <button type="button" class="btn btn-outline-primary">Save</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="modify()">Save</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="container w-50" style="min-width: 500px;">
-            <div class="row mb-3">
+            <div class="row mt-3">
                 <div class="col">
                     <div id="warningAlert" class="alert alert-dismissible alert-warning collapse" role="alert">
                         <div id="warningAlertMessage"><strong>Warning!</strong> Example warning message.</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" data-ng-click="vm.result = null" aria-label="Close"></button>
+                        <button type="button" class="btn-close" onclick="dismissWarm()"></button>
+                    </div>
+                    <div id="successAlert" class="alert alert-dismissible alert-success collapse" role="alert">
+                        <div id="successAlertMessage"><strong>Success</strong> Example success message.</div>
+                        <button type="button" class="btn-close" onclick="dismissSuccess()"></button>
                     </div>
                 </div>
             </div>
@@ -70,7 +75,10 @@
                                                      </a>
                                                  </li>
                                                  <li class="nav-item">
-                                                     <a id="ordersLink"  class="nav-link disabled" aria-current="true" onclick="showControllerTab('orders')" data-bs-toggle="tooltip" data-bs-placement="right" title="0">Orders</a>
+                                                     <a id="tradesLink"  class="nav-link disabled" aria-current="true" onclick="showControllerTab('trades')" data-bs-toggle="tooltip" data-bs-placement="right" title="0">
+                                                         Trades
+                                                         <span id="tradeCount" class="badge bg-secondary p-1" style="font-size:12px">0</span>
+                                                     </a>
                                                  </li>
                                             </ul>
                                         </div>
@@ -153,31 +161,22 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </body>
 
 {% block javascript %}
     <script>
-        var graph = new Chart(document.getElementById('graph'), {type: 'line', data: CHART_INITIAL_CONFIG, options: CHART_OPTIONS});
-        refresh();
-
         function refresh() {
-            heartbeat = document.getElementById("heartbeat");
-            updateModel(graph);
-            updateController();
-            var datetime = new Date().toLocaleTimeString();
-            heartbeat.innerHTML = datetime;
+            update(graph);
         }
 
         window.onload = function(){
+            graph = new Chart(document.getElementById('graph'), {type: 'line', data: CHART_INITIAL_CONFIG, options: CHART_OPTIONS});
+            refresh();
             if ({{ static }}) {
                 warn('All data on this page is static and will not be updated.');
-                document.getElementById("heartbeat").classList.add("bg-warning");
-                document.getElementById("heartbeat").classList.add("text-dark");
-                document.getElementById("heartbeat").innerHTML = "STATIC";
+                static();
             } else {
-                document.getElementById("heartbeat").classList.add("bg-primary");
                 setInterval(refresh, {{ refresh_interval * 1000 }});
             }
         };
@@ -185,7 +184,8 @@
 {% endblock %}
 
 <style>
-     .list-card { overflow-x: scroll; min-width: 50px;  max-height:33vh;}
+    .card {min-width: 200px !important;}
+    .card-body {max-height: 35vh; overflow-y: scroll;}
     .show {display: block;}
     .spinner-border {animation-duration: 1.5s;}
     .run-table {font-size:12px;}
@@ -194,7 +194,7 @@
     .font-m{font-size:14px;}
     li:hover {cursor: pointer;}
     .btn-close{width:5px;height:5px;}
-    .nav-link{padding-top:5px;padding-bottom:10px;padding-left:8px;padding-right:8px;}
+    .nav-link{padding-top:5px;padding-bottom:12px;padding-left:8px;padding-right:8px;}
 </style>
 
 </html>
